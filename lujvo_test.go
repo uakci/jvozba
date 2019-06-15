@@ -1,4 +1,4 @@
-package jvozba
+package github.com/ciuak/jvozba
 
 import (
 	"fmt"
