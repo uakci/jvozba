@@ -1,4 +1,4 @@
-package "github.com/ciuak/jvozba"
+package jvozba
 
 import "testing"
 

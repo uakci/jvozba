@@ -1,4 +1,4 @@
-package "github.com/ciuak/jvozba"
+package jvozba
 
 func Jvozba(tanru string) (string, error) {
 	return Zbasu(tanru, Rafsi, false)
