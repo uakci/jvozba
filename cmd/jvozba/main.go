@@ -1,4 +1,4 @@
-package jvozba
+package main
 
 import (
 	"bufio"
