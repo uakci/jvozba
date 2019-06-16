@@ -382,6 +382,7 @@ var Rafsi = map[string][]string{
 	"jdari": []string{"jar"},
 	"jansu": []string{"jas"},
 	"janta": []string{"jat"},
+	"jai":   []string{"jax"},
 	"ja":    []string{"jav"},
 	"jbari": []string{"jba"},
 	"jbena": []string{"jbe"},
