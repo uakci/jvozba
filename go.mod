@@ -1,3 +1,3 @@
-module github.com/ciuak/jvozba
+module github.com/uakci/jvozba
 
 go 1.12
