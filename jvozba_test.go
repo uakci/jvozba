@@ -3,8 +3,8 @@ package jvozba
 import "testing"
 
 func TestNoralujv(t *testing.T) {
-	for i, n := range Noralujv {
-		res, err := Jvozba(n.tanru)
+	for i, n := range noralujv {
+		res, err := Jvozba(n.tanru, Brivla)
 		if err != nil {
 			t.Errorf("on example #%d (%s): got error: %v", i, n.lujvo, err)
 		} else if res != n.lujvo {
@@ -13,12 +13,30 @@ func TestNoralujv(t *testing.T) {
 	}
 }
 
+const specimen = "xindo gugde"
+
+func TestCmevlaBrivla(t *testing.T) {
+	cmevla, err := Jvozba(specimen, Cmevla)
+	both, err2 := Jvozba(specimen, Cmevla|Brivla)
+	if err != nil || err2 != nil || cmevla != both {
+		t.Fail()
+	}
+}
+
 type nora struct {
 	lujvo string
 	tanru string
 }
 
-var Noralujv = []nora{
+var noralujv = []nora{
+	// own tests
+	nora{"barduku'ykei", "barduku kelci"},
+	nora{"miby'ismu", "mi ismu"},
+	nora{"mibyiismu", "mi iismu"},
+	nora{"iismynei", "iismu nelci"},
+	nora{"norycrezuue", "no'e crezuue"},
+
+	// the original noralujv
 	nora{"ba'armo'a", "barna morna"},
 	nora{"ba'orzu'e", "banro zukte"},
 	nora{"ba'ostu", "banro stuzi"},

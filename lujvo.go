@@ -1,29 +1,32 @@
 package jvozba
 
-import (
-	"strings"
-)
+import "strings"
 
+// Yields the numerical score of a lujvo form, using the algorithm described in
+// the Complete Logical Language.
 func Score(lujvo string) int {
 	L := len(lujvo)
 	// apostrophe count, hyphen count, rafsi score count, vowel count
-	A := 0
-	H := 0
-	R := 0
-	V := 0
+	A, H, R, V := 0, 0, 0, 0
 	var curr string
 	for len(lujvo) > 0 {
 		curr, lujvo = katna(lujvo)
 		tai := rafsiTarmi(curr)
 		R += int(tai)
 		switch tai {
-		case Hyphen:
+		case hyphen:
 			H++
-		case CVhV:
+		case cvhv:
 			V += 2
 			A++
-		case CVCCV, CCVCV, CVV:
+		case cvccv, ccvcv, cvv:
 			V += 2
+		case fuhivla:
+			for _, c := range curr {
+				if isVowel(byte(c)) {
+					V++
+				}
+			}
 		default:
 			V += 1
 		}
@@ -35,70 +38,80 @@ func Score(lujvo string) int {
 type tarmi int
 
 const (
-	Hyphen tarmi = iota
-	CVCCV
-	CVCC
-	CCVCV
-	CCVC
-	CVC
-	CVhV
-	CCV
-	CVV
+	hyphen tarmi = iota
+	cvccv
+	cvcc
+	ccvcv
+	ccvc
+	cvc
+	cvhv
+	ccv
+	cvv
+	fuhivla
 )
 
 func rafsiTarmi(rafsi string) tarmi {
 	l := len(rafsi)
+	if l == 0 || (!isConsonant(rafsi[0]) && l != 1) {
+		return fuhivla
+	}
 	switch l {
 	case 1:
-		return Hyphen
-	case 5:
-		if isVowel(rafsi[2]) {
-			return CCVCV
-		} else {
-			return CVCCV
+		if rafsi == "y" || rafsi == "r" || rafsi == "n" {
+			return hyphen
 		}
-	case 4:
-		if rafsi[2] == '\'' {
-			return CVhV
-		} else if !isVowel(rafsi[3]) {
-			if isVowel(rafsi[2]) {
-				return CCVC
-			} else {
-				return CVCC
+	case 3:
+		if !isVowel(rafsi[2]) {
+			if isVowel(rafsi[1]) && isConsonant(rafsi[2]) {
+				return cvc
 			}
 		} else {
-			return Hyphen
-		}
-	// case 3:
-	default:
-		if !isVowel(rafsi[2]) {
-			return CVC
-		} else {
 			if isVowel(rafsi[1]) {
-				return CVV
+				return cvv
+			} else if isConsonant(rafsi[1]) {
+				return ccv
+			}
+		}
+	case 4:
+		if isVowel(rafsi[1]) {
+			if isVowel(rafsi[3]) {
+				if rafsi[2] == '\'' {
+					return cvhv
+				}
+			} else if isConsonant(rafsi[2]) && isConsonant(rafsi[3]) {
+				return cvcc
+			}
+		} else if isConsonant(rafsi[1]) && isVowel(rafsi[2]) && isConsonant(rafsi[3]) {
+			return ccvc
+		}
+	case 5:
+		if isGismu(rafsi) {
+			if isVowel(rafsi[2]) {
+				return ccvcv
 			} else {
-				return CCV
+				return cvccv
 			}
 		}
 	}
+	return fuhivla
 }
 
 type zunsna int
 
 const (
-	Unvoiced zunsna = iota
-	Voiced
-	Liquid
+	unvoiced zunsna = iota
+	voiced
+	liquid
 )
 
 func zunsnaType(one byte) zunsna {
 	switch one {
 	case 'b', 'd', 'g', 'v', 'j', 'z':
-		return Voiced
+		return voiced
 	case 'p', 't', 'k', 'f', 'c', 's', 'x':
-		return Unvoiced
+		return unvoiced
 	default:
-		return Liquid
+		return liquid
 	}
 }
 
@@ -119,7 +132,7 @@ func needsY(previous byte, current string) bool {
 	head := current[0]
 	prevType := zunsnaType(previous)
 	headType := zunsnaType(head)
-	if (prevType == Voiced && headType == Unvoiced) || (headType == Voiced && prevType == Unvoiced) || previous == head || (isCjsz(previous) && isCjsz(head)) {
+	if (prevType == voiced && headType == unvoiced) || (headType == voiced && prevType == unvoiced) || previous == head || (isCjsz(previous) && isCjsz(head)) {
 		return true
 	}
 	comb := string([]byte{previous, head})
@@ -134,9 +147,25 @@ func needsY(previous byte, current string) bool {
 	return false
 }
 
+var validInitials = []string{
+	"bl", "br", "cf", "ck", "cl", "cm", "cn", "cp", "cr", "ct",
+	"dj", "dr", "dz", "fl", "fr", "gl", "gr", "jb", "jd", "jg",
+	"jm", "jv", "kl", "kr", "ml", "mr", "pl", "pr", "sf", "sk",
+	"sl", "sm", "sn", "sp", "sr", "st", "tc", "tr", "ts", "vl",
+	"vr", "xl", "xr", "zb", "zd", "zg", "zm", "zv",
+}
+
 func isValidInitial(twoBytes ...byte) bool {
-	return len(twoBytes) == 2 &&
-		strings.Contains("bl~br~cf~ck~cl~cm~cn~cp~cr~ct~dj~dr~dz~fl~fr~gl~gr~jb~jd~jg~jm~jv~kl~kr~ml~mr~pl~pr~sf~sk~sl~sm~sn~sp~sr~st~tc~tr~ts~vl~vr~xl~xr~zb~zd~zg~zm~zv", string(twoBytes))
+	if len(twoBytes) != 2 {
+		return false
+	}
+	stringified := string(twoBytes)
+	for _, validInitial := range validInitials {
+		if stringified == validInitial {
+			return true
+		}
+	}
+	return false
 }
 
 // Whether `lujvo` could lead to tosmabru on appending -y or is one already.
@@ -147,16 +176,16 @@ func isTosmabruInitial(lujvo string) bool {
 	for lujvo != "" {
 		r, lujvo = katna(lujvo)
 		switch t := rafsiTarmi(r); t {
-		case CVC:
+		case cvc:
 			if i > 0 && !isValidInitial(lastChar, r[0]) {
 				return false
 			}
 			lastChar = r[2]
-		case CVCCV:
+		case cvccv:
 			return i > 0 &&
 				isValidInitial(lastChar, r[0]) &&
 				isValidInitial(r[2], r[3])
-		case Hyphen:
+		case hyphen:
 			return i > 1 && r == "y"
 		default:
 			return false
@@ -176,12 +205,18 @@ func isVowel(one byte) bool {
 	}
 }
 
+func isConsonant(one byte) bool {
+	return !isVowel(one) && one != 'y' && one != '\''
+}
+
 // Make one cut. Atrocious code.
 func katna(lujvo string) (string, string) {
 	var point /* of cission */ int
 	l := len(lujvo)
 	switch {
-	case l >= 4 && (lujvo[0] == 'n' || lujvo[0] == 'r' || lujvo[0] == 'y') && !isVowel(lujvo[1]):
+	case l > 0 && lujvo[0] == 'y':
+		point = 1
+	case l >= 4 && (lujvo[0] == 'n' || lujvo[0] == 'r' || lujvo[0] == 'y') && isConsonant(lujvo[1]):
 		point = 1
 	case l >= 8 && lujvo[4] == 'y':
 		point = 4
@@ -189,10 +224,13 @@ func katna(lujvo string) (string, string) {
 		point = 3
 	case l >= 7 && lujvo[2] == '\'' && isVowel(lujvo[3]):
 		point = 4
-	case l >= 6:
+	case l >= 6 && strings.Index(lujvo[:6], "y") == -1:
 		point = 3
 	default:
-		point = l
+		point = strings.Index(lujvo, "y")
+		if point == -1 {
+			point = l
+		}
 	}
 	return lujvo[:point], lujvo[point:]
 }
@@ -206,6 +244,8 @@ type scored struct {
 // -y-: L += 1 && H += 1 -> score += 1100
 const yPenalty = 1100
 
+// Lujvo is the most direct interface to the lujvo maker. The only argument is
+// a list of affix forms for each constituent.
 func Lujvo(selci [][]string) (string, error) {
 	candidates := []scored{{"", 0, false}}
 	for selciN, cnino := range selci {
@@ -221,7 +261,7 @@ func Lujvo(selci [][]string) (string, error) {
 					hyphen = "y"
 				} else if selciN == 1 {
 					tai := rafsiTarmi(laldo.lujvo)
-					if (tai == CVV || tai == CVhV) && !(isLast && rafsiTarmi(rafsi) == CCV) {
+					if (tai == cvv || tai == cvhv) && !(isLast && rafsiTarmi(rafsi) == ccv) {
 						if rafsi[0] == 'r' {
 							hyphen = "n"
 						} else {
@@ -229,7 +269,7 @@ func Lujvo(selci [][]string) (string, error) {
 						}
 					}
 				}
-				if !isLast && (rafsiTarmi(rafsi) == CVCC || rafsiTarmi(rafsi) == CCVC) {
+				if !isLast && (rafsiTarmi(rafsi) == cvcc || rafsiTarmi(rafsi) == ccvc) {
 					rafsi += "y"
 				}
 				newPart := hyphen + rafsi
@@ -270,7 +310,7 @@ func Lujvo(selci [][]string) (string, error) {
 		}
 	}
 	result := bestOption.lujvo
-	if bestOption.tosmabru {
+	if bestOption.tosmabru && isVowel(result[len(result)-1]) {
 		result = result[:3] + "y" + result[3:]
 	}
 	return result, nil
