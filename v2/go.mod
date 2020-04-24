@@ -1,4 +1,4 @@
-module github.com/uakci/jvozba/v2
+module github.com/uakci/jvozba
 
 go 1.12
 

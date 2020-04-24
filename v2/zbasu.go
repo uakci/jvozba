@@ -35,14 +35,17 @@ func selci(tanru string, rafste map[string][]string, config Config) ([][]string,
 	if config&(Brivla|Cmevla) == 0 {
 		return [][]string{}, fmt.Errorf("neither Cmevla or Brivla was specified")
 	}
-	parts := strings.Split(tanru, " ")
-	count := 0
-	selci := make([][]string, len(parts))
-	for i, p := range parts {
+	dirty_parts := strings.Split(tanru, " ")
+	parts := make([]string, 0, len(dirty_parts))
+	for _, p := range dirty_parts {
 		p = strings.Trim(p, "\n")
-		if p == "" {
-			continue
+		if p != "" {
+			parts = append(parts, p)
 		}
+	}
+
+	selci := make([][]string, 0, len(parts))
+	for i, p := range parts {
 		final := i == len(parts)-1
 		r := rafste[p]
 
@@ -75,30 +78,31 @@ func selci(tanru string, rafste map[string][]string, config Config) ([][]string,
 			}
 		}
 
-		filtered := make([]string, len(r))
-		c := 0
+		filtered := make([]string, 0, len(r))
 		for _, one := range r {
 			keep := true
-			if final {
-				switch rafsiTarmi(one) {
-				case ccv, cvv, cvhv:
+			switch rafsiTarmi(one) {
+			case ccv, cvv, cvhv:
+				if final {
 					keep = config&Brivla == Brivla
-				case cvcc, ccvc, cvc:
+				} else if i == 0 {
+					keep = isGismu(parts[1]) || isCmavo(parts[1])
+				}
+			case cvcc, ccvc, cvc:
+				if final {
 					keep = config&Cmevla == Cmevla
 				}
 			}
 			if keep {
-				filtered[c] = one
-				c++
+				filtered = append(filtered, one)
 			}
 		}
-		if c == 0 {
+		if len(filtered) == 0 {
 			return [][]string{}, fmt.Errorf("no applicable rafsi found for %s", p)
 		}
-		selci[count] = filtered[:c]
-		count++
+		selci = append(selci, filtered)
 	}
-	return selci[:count], nil
+	return selci, nil
 }
 
 // Zbasu is like Jvozba, but it allows you to specify your own list of rafsi.

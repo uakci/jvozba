@@ -35,6 +35,12 @@ var noralujv = []nora{
 	nora{"mibyiismu", "mi iismu"},
 	nora{"iismynei", "iismu nelci"},
 	nora{"norycrezuue", "no'e crezuue"},
+	nora{"zganyiicne", "zgana iicne"},
+	nora{"zgazga'yiicne", "zgana zgana iicne"},
+	nora{"zgafai'yiicne", "zgana fatri iicne"},
+	nora{"bapyiicne", "bapli iicne"},
+	nora{"bapyiicne", "bapli iicne"},
+	nora{"fatryiicne", "fatri iicne"},
 
 	// the original noralujv
 	nora{"ba'armo'a", "barna morna"},

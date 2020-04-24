@@ -9,27 +9,20 @@ func Score(lujvo string) int {
 	// apostrophe count, hyphen count, rafsi score count, vowel count
 	A, H, R, V := 0, 0, 0, 0
 	var curr string
+	for _, b := range lujvo {
+		if isVowel(byte(b)) {
+			V++
+		} else if b == 'y' {
+			H++
+		} else if b == '\'' {
+			A++
+			H++
+		}
+	}
 	for len(lujvo) > 0 {
 		curr, lujvo = katna(lujvo)
 		tai := rafsiTarmi(curr)
 		R += int(tai)
-		switch tai {
-		case hyphen:
-			H++
-		case cvhv:
-			V += 2
-			A++
-		case cvccv, ccvcv, cvv:
-			V += 2
-		case fuhivla:
-			for _, c := range curr {
-				if isVowel(byte(c)) {
-					V++
-				}
-			}
-		default:
-			V += 1
-		}
 	}
 	return 1000*L - 500*A + 100*H - 10*R - V
 }
@@ -58,6 +51,10 @@ func rafsiTarmi(rafsi string) tarmi {
 	switch l {
 	case 1:
 		if rafsi == "y" || rafsi == "r" || rafsi == "n" {
+			return hyphen
+		}
+	case 2:
+		if rafsi == "'y" {
 			return hyphen
 		}
 	case 3:
@@ -216,6 +213,8 @@ func katna(lujvo string) (string, string) {
 	switch {
 	case l > 0 && lujvo[0] == 'y':
 		point = 1
+	case l > 1 && lujvo[:2] == "'y":
+		point = 2
 	case l >= 4 && (lujvo[0] == 'n' || lujvo[0] == 'r' || lujvo[0] == 'y') && isConsonant(lujvo[1]):
 		point = 1
 	case l >= 8 && lujvo[4] == 'y':
@@ -259,6 +258,11 @@ func Lujvo(selci [][]string) (string, error) {
 				hyphen := ""
 				if l > 0 && needsY(laldo.lujvo[l-1], rafsi[:2]) {
 					hyphen = "y"
+				} else if !isLast && rafsiTarmi(selci[selciN+1][0]) == fuhivla {
+					switch rafsiTarmi(rafsi) {
+					case cvhv, ccv, cvv:
+						rafsi += "'"
+					}
 				} else if selciN == 1 {
 					tai := rafsiTarmi(laldo.lujvo)
 					if (tai == cvv || tai == cvhv) && !(isLast && rafsiTarmi(rafsi) == ccv) {
@@ -269,7 +273,7 @@ func Lujvo(selci [][]string) (string, error) {
 						}
 					}
 				}
-				if !isLast && (rafsiTarmi(rafsi) == cvcc || rafsiTarmi(rafsi) == ccvc) {
+				if !isLast && (rafsiTarmi(rafsi) == cvcc || rafsiTarmi(rafsi) == ccvc) && rafsiTarmi(selci[selciN+1][0]) != fuhivla {
 					rafsi += "y"
 				}
 				newPart := hyphen + rafsi
