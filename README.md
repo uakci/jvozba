@@ -1,8 +1,10 @@
 # jvozba
 
+[![](https://godoc.org/github.com/uakci/jvozba/v2?status.svg)](https://godoc.org/github.com/uakci/jvozba/v2)
+
 An O(*n*) implementation of the lujvo-making algorithm to save the world.
 
-**NOTE:** Version 1 is *deprecated*. Please use version 2 by importing the versioned path `github.com/uakci/jvozba/v2`.
+Please use version 2 by importing the versioned path `github.com/uakci/jvozba/v2`.
 
 ## What's the big deal with O(*n*), anyway?
 
