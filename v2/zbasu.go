@@ -57,7 +57,7 @@ func selci(tanru string, rafste map[string][]string, config Config) ([][]string,
 			midPrefix := "y'"
 			if i == 0 || isGismu(p) {
 				midPrefix = ""
-			} else if isConsonant(p[0]) || (isVowel(p[0]) && isVowel(p[1])) {
+			} else if isConsonant(p[0]) || (isVowel(p[1]) && (p[0] == 'i' || p[0] == 'u')) {
 				midPrefix = "y"
 			}
 			if canShort {

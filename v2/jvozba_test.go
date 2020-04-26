@@ -41,6 +41,7 @@ var noralujv = []nora{
 	nora{"bapyiicne", "bapli iicne"},
 	nora{"bapyiicne", "bapli iicne"},
 	nora{"fatryiicne", "fatri iicne"},
+	nora{"fatry'aicne", "fatri aicne"},
 
 	// the original noralujv
 	nora{"ba'armo'a", "barna morna"},
