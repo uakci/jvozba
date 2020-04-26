@@ -19,6 +19,13 @@ const (
 	Brivla Config = 1 << iota
 	// Cmevla = predicate word form; word form which ends in a vowel.
 	Cmevla
+
+	// Always use full affix forms for fu'ivla. For example, with this option
+	// turned on, -almy- will become -alma'y-, exposing the final vowel. This
+	// flag does not affect fu'ivla which would be ambiguous without the vowel,
+	// such as ‘barduku’ or ‘spatula’ (-barduky-, -spatuly- look like two rafsi
+	// each).
+	LongFuhivla
 )
 
 // This is the easiest lujvo-making function you can use; the possible rafsi

@@ -61,7 +61,7 @@ func selci(tanru string, rafste map[string][]string, config Config) ([][]string,
 				midPrefix = "y"
 			}
 			if canShort {
-				if !isGismu(p) && len(midPrefix) < 2 && isLujvoInitial(p[:len(p)-1]) {
+				if !isGismu(p) && ((len(midPrefix) < 2 && isLujvoInitial(p[:len(p)-1])) || config&LongFuhivla == LongFuhivla) {
 					if !final {
 						r = append(r, midPrefix+p+"'y")
 					}
