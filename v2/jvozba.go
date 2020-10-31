@@ -58,7 +58,7 @@ var Rafsi = map[string][]string{
 	"bartu": {"bar"},
 	"basti": {"bas"},
 	"batci": {"bat"},
-	"bebna": {"beb", "ne'a"},
+	"bebna": {"beb"},
 	"bemro": {"be'o", "bem"},
 	"bende": {"be'e", "bed"},
 	"bengo": {"beg"},
