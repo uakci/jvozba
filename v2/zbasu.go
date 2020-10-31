@@ -31,16 +31,17 @@ func isLujvoInitial(what string) bool {
 	return true
 }
 
+var h = strings.NewReplacer("h", "'", "’", "'")
+
 func selci(tanru string, rafste map[string][]string, config Config) ([][]string, error) {
 	if config&(Brivla|Cmevla) == 0 {
 		return [][]string{}, fmt.Errorf("neither Cmevla or Brivla was specified")
 	}
-	dirty_parts := strings.Split(tanru, " ")
+	dirty_parts := strings.Fields(tanru)
 	parts := make([]string, 0, len(dirty_parts))
 	for _, p := range dirty_parts {
-		p = strings.Trim(p, "\n")
-		if p != "" {
-			parts = append(parts, p)
+		if len(p) > 0 {
+			parts = append(parts, h.Replace(p))
 		}
 	}
 
