@@ -1,6 +1,9 @@
 package jvozba
 
-import "strings"
+import (
+  "fmt"
+  "strings"
+)
 
 // Yields the numerical score of a lujvo form, using the algorithm described in
 // the Complete Logical Language.
@@ -246,6 +249,9 @@ const yPenalty = 1100
 // Lujvo is the most direct interface to the lujvo maker. The only argument is
 // a list of affix forms for each constituent.
 func Lujvo(selci [][]string) (string, error) {
+  if len(selci) < 2 {
+    return "", fmt.Errorf("need at least two tanru words")
+  }
 	candidates := []scored{{"", 0, false}}
 	for selciN, cnino := range selci {
 		isLast := selciN == len(selci)-1

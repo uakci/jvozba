@@ -35,7 +35,7 @@ var h = strings.NewReplacer("h", "'", "’", "'")
 
 func selci(tanru string, rafste map[string][]string, config Config) ([][]string, error) {
 	if config&(Brivla|Cmevla) == 0 {
-		return [][]string{}, fmt.Errorf("neither Cmevla or Brivla was specified")
+		return [][]string{}, fmt.Errorf("neither Cmevla nor Brivla was specified")
 	}
 	dirty_parts := strings.Fields(tanru)
 	parts := make([]string, 0, len(dirty_parts))
