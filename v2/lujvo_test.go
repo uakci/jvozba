@@ -106,6 +106,14 @@ func TestIsTosmabruInitial(t *testing.T) {
 	}
 }
 
+func TestKatna(t *testing.T) {
+  res := Katna([]byte("co'arzukybarduku'y'arcycizda'u"))
+  got := string(bytes.Join(res, []byte{'-'}))
+  if got != "co'a-zuk-barduku-arc-ciz-da'u" {
+    t.Errorf("%s", got)
+  }
+}
+
 func BenchmarkLujvoWithBloti1000(b *testing.B) {
 	bloti := strings.Repeat("bloti", 1000)
 	selci, _ := Selci(bloti, Rafsi, Brivla)

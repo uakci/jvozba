@@ -271,6 +271,43 @@ func katna(lujvo []byte) ([]byte, []byte) {
 	return lujvo[:point], lujvo[point:]
 }
 
+func Katna(lujvo []byte) (result [][]byte) {
+  chunk := make([][]byte, 0, len(lujvo) / 3)
+  fuhivlaTainted := false
+  var rafsi []byte
+  for len(lujvo) > 0 {
+    rafsi, lujvo = katna(lujvo)
+    tai := rafsiTarmi(rafsi)
+    switch tai {
+    case hyphen:
+      if fuhivlaTainted {
+        result = append(result, bytes.Join(chunk, []byte{}))
+      } else {
+        result = append(result, chunk...)
+      }
+      chunk = [][]byte{}
+      fuhivlaTainted = false
+    case fuhivla:
+      fuhivlaTainted = true
+      fallthrough
+    default:
+      if rafsi[0] == '\'' {
+        rafsi = rafsi[1:]
+      }
+      if rafsi[len(rafsi) - 1] == '\'' {
+        rafsi = rafsi[:len(rafsi) - 1]
+      }
+      chunk = append(chunk, rafsi)
+    }
+  }
+  if fuhivlaTainted {
+    result = append(result, bytes.Join(chunk, []byte{}))
+  } else {
+    result = append(result, chunk...)
+  }
+  return result
+}
+
 type scored struct {
 	lujvo    []byte
 	score    int
