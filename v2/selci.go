@@ -3,7 +3,6 @@ package jvozba
 import (
 	"bytes"
 	"fmt"
-	"strings"
 )
 
 func isCmavo(what []byte) bool {
@@ -59,23 +58,45 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 	if config&(Brivla|Cmevla) == 0 {
 		return [][][]byte{}, fmt.Errorf("neither Cmevla nor Brivla was specified")
 	}
-	dirty_parts := strings.Fields(tanru)
-	parts := make([][]byte, 0, len(dirty_parts))
-	for _, p := range dirty_parts {
-		if len(p) > 0 {
-			neu := make([]byte, 0, len(p))
-			for i, c := range p {
-				if c == '’' || c == 'h' {
-					neu = append(neu, '\'')
-				} else if (c >= 'a' && c <= 'z' && c != 'q' && c != 'w') || c == '\'' {
-					neu = append(neu, byte(c))
-				} else if !(i == 0 && c == '.') {
-					return [][][]byte{}, fmt.Errorf("invalid character: %v", c)
-				}
-			}
-			parts = append(parts, neu)
-		}
-	}
+  parts := make([][]byte, 0, len(tanru) / 6)
+  base := 0
+  for i, r := range tanru {
+    switch {
+    case (r >= 'a' && r <= 'z' && r != 'q' && r != 'w') || r == '\'' || r == ',' || r == '.' || r == '’':
+      continue
+    case r == ' ' || r == '\t' || r == '\r' || r == '\n':
+      if i > base {
+        parts = append(parts, []byte(tanru[base:i]))
+      }
+      base = i + 1
+    default:
+      return [][][]byte{}, fmt.Errorf("unexpected character %v", r)
+    }
+  }
+  if len(tanru) > base {
+    parts = append(parts, []byte(tanru[base:]))
+  }
+  for i, p := range parts {
+    j := 0
+    for ; j < len(p); j++ {
+      if p[j] == 'h' {
+        p[j] = '\''
+      } else if p[j] == 0xe2 {
+        break
+      }
+    }
+    if j != len(p) {
+      offset := 0
+      for ; j < len(p); j++ {
+        if p[j] == 0xe2 {
+          p[j] = '\''
+          copy(p[j+1:],p[j+3:])
+          offset += 2
+        }
+      }
+      parts[i] = p[:j - offset]
+    }
+  }
 
 	selci := make([][][]byte, 0, len(parts))
 	for i, p := range parts {
