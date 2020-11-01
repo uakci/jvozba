@@ -100,18 +100,18 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 			if canShort {
 				if !isGismu(p) && ((len(midPrefix) < 2 && isLujvoInitial(p[:len(p)-1])) || config&LongFuhivla == LongFuhivla) {
 					if !final {
-						r = append(r, append(append(append([]byte{}, midPrefix...), p...), "'y"...))
+						r = append(r, bytes.Join([][]byte{midPrefix, p, []byte("'y")}, []byte{}))
 					}
 				} else if !(isGismu(p) && bytes.Equal(p[:4], []byte("brod")) && p[4] != 'a') {
 					if final || isGismu(p) {
-						r = append(r, append(append([]byte{}, midPrefix...), p[:len(p)-1]...))
+						r = append(r, bytes.Join([][]byte{midPrefix, p[:len(p)-1]}, []byte{}))
 					} else {
-						r = append(r, append(append(append([]byte{}, midPrefix...), p[:len(p)-1]...), 'y'))
+						r = append(r, bytes.Join([][]byte{midPrefix, p[:len(p)-1], {'y'}}, []byte{}))
 					}
 				}
 			}
 			if canLong {
-				r = append(r, append(midPrefix, p...))
+				r = append(r, bytes.Join([][]byte{midPrefix, p}, []byte{}))
 			}
 		}
 

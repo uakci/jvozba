@@ -2,6 +2,7 @@ package jvozba
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 )
 
@@ -102,5 +103,23 @@ func TestIsTosmabruInitial(t *testing.T) {
 			t.Errorf("'%s': got %v",
 				k, res)
 		}
+	}
+}
+
+func BenchmarkLujvoWithBloti1000(b *testing.B) {
+	bloti := strings.Repeat("bloti", 1000)
+	selci, _ := Selci(bloti, Rafsi, Brivla)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = Lujvo(selci)
+	}
+}
+
+func BenchmarkLujvoWithBlaci1000(b *testing.B) {
+	blaci := strings.Repeat("blaci", 1000)
+	selci, _ := Selci(blaci, Rafsi, Brivla)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = Lujvo(selci)
 	}
 }

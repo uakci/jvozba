@@ -1,6 +1,8 @@
 package jvozba
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNoralujv(t *testing.T) {
 	for i, n := range noralujv {
@@ -23,7 +25,7 @@ func TestCmevlaBrivla(t *testing.T) {
 	}
 }
 
-func BenchmarkNoralujv(b *testing.B) {
+func BenchmarkJvozbaWithNoralujv(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = Jvozba(noralujv[i%len(noralujv)].lujvo, Brivla)
 	}

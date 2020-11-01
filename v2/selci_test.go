@@ -2,6 +2,7 @@ package jvozba
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -41,5 +42,21 @@ func TestGeneration(t *testing.T) {
 		} else if fmt.Sprintf("%v", s_) != fmt.Sprintf("%v", e.selci) {
 			t.Errorf("(example #%d): got %v, expected %v (config=%v)", i, s_, e.selci, e.config)
 		}
+	}
+}
+
+func BenchmarkSelciWithBloti1000(b *testing.B) {
+	bloti := strings.Repeat("bloti", 1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = Selci(bloti, Rafsi, Brivla)
+	}
+}
+
+func BenchmarkSelciWithBlaci1000(b *testing.B) {
+	blaci := strings.Repeat("blaci", 1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = Selci(blaci, Rafsi, Brivla)
 	}
 }
