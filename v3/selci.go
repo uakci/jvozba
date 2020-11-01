@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func isCmavo(what []byte) bool {
+func IsCmavo(what []byte) bool {
 	if len(what) < 2 || !bytes.Contains([]byte("bcdfgjklmnprstvxziu"), []byte{what[0]}) || !bytes.Contains([]byte("aeiouy"), []byte{what[1]}) {
 		return false
 	}
@@ -107,7 +107,7 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 			r[i] = []byte(rafsi)
 		}
 
-		if !isCmavo(p) {
+		if !IsCmavo(p) {
 			canShort, canLong := config&Cmevla == Cmevla, config&Brivla == Brivla
 			if !final {
 				canShort, canLong = true, false
@@ -144,7 +144,7 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 				if final {
 					keep = config&Brivla == Brivla
 				} else if i == 0 {
-					keep = IsGismu(parts[1]) || isCmavo(parts[1])
+					keep = IsGismu(parts[1]) || IsCmavo(parts[1])
 				}
 			case cvcc, ccvc, cvc:
 				if final {
