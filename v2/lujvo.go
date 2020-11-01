@@ -314,21 +314,9 @@ func Katna(lujvo []byte) (result [][]byte) {
 		i++
 	}
 	if fuhivlaTainted {
-		res := bytes.Join(chunk, []byte{})
-		if isConsonant(res[len(res)-1]) {
-			res = append(res, 'a')
-		} else if res[len(res)-1] == '\'' {
-			res = res[:len(res)-1]
-		} else {
-			res = append(res, 'a')
-		}
-		result = append(result, res)
+		result = append(result, bytes.Join(chunk, []byte{}))
 	} else {
-		for _, c := range chunk {
-			if len(c) > 1 {
-				result = append(result, c)
-			}
-		}
+    result = append(result, chunk...)
 	}
 	return result
 }
