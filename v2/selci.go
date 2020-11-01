@@ -38,9 +38,9 @@ func isCmavo(what []byte) bool {
 
 func isGismu(what []byte) bool {
 	return len(what) == 5 &&
-		isVowel(what[4]) &&
-		isConsonant(what[0]) && isConsonant(what[3]) && ((isVowel(what[1]) && isConsonant(what[2])) ||
-		(isConsonant(what[1]) && isVowel(what[2])))
+		IsVowel(what[4]) &&
+		IsConsonant(what[0]) && IsConsonant(what[3]) && ((IsVowel(what[1]) && IsConsonant(what[2])) ||
+		(IsConsonant(what[1]) && IsVowel(what[2])))
 }
 
 func isLujvoInitial(what []byte) bool {
@@ -115,7 +115,7 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 			midPrefix := []byte("y'")
 			if i == 0 || isGismu(p) {
 				midPrefix = []byte{}
-			} else if isConsonant(p[0]) || (isVowel(p[1]) && (p[0] == 'i' || p[0] == 'u')) {
+			} else if IsConsonant(p[0]) || (IsVowel(p[1]) && (p[0] == 'i' || p[0] == 'u')) {
 				midPrefix = []byte{'y'}
 			}
 			if canShort {
