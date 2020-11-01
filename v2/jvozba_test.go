@@ -23,6 +23,12 @@ func TestCmevlaBrivla(t *testing.T) {
 	}
 }
 
+func BenchmarkNoralujv(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = Jvozba(noralujv[i%len(noralujv)].lujvo, Brivla)
+	}
+}
+
 type nora struct {
 	lujvo string
 	tanru string

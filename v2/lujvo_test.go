@@ -1,8 +1,7 @@
 package jvozba
 
 import (
-	"fmt"
-	"strings"
+	"bytes"
 	"testing"
 )
 
@@ -15,21 +14,22 @@ func TestHyphenation(t *testing.T) {
 		{"zbasai", "zba-sai", "78"},
 		{"nunynau", "nun-y-nau", "508"},
 		{"sairzbata'u", "sai-r-zba-ta'u", "8076"},
-		{"zbazbasysarji", "zba-zbas-y-sarji", "7401"}}
+		{"zbazbasysarji", "zba-zbas-y-sarji", "7401"},
+		{"lojbaugri", "loj-bau-gri", "587"}}
 	for i, e := range examples {
-		total := []string{}
-		types := ""
-		s := e.whole
-		var sle string
+		total := [][]byte{}
+		types := []byte{}
+		s := []byte(e.whole)
+		var sle []byte
 		for len(s) > 0 {
-			sle, s = katna(s)
+			sle, s = katna([]byte(s))
 			total = append(total, sle)
-			types += fmt.Sprintf("%d", int(rafsiTarmi(sle)))
+			types = append(types, '0'+byte(rafsiTarmi(sle)))
 		}
-		attempt := strings.Join(total, "-")
-		if e.parts != attempt || e.types != types {
+		attempt := bytes.Join(total, []byte{'-'})
+		if !bytes.Equal([]byte(e.parts), attempt) || !bytes.Equal([]byte(e.types), types) {
 			t.Errorf("'%s' (example #%d): got %s %s, expected %s %s",
-				e.whole, i, attempt, types, e.parts, e.types)
+				e.whole, i, string(attempt), string(types), e.parts, e.types)
 		}
 	}
 }
@@ -45,7 +45,7 @@ func TestCLLScoring(t *testing.T) {
 		{"sairzbata'u", 10385},
 		{"zbazbasysarji", 12976}}
 	for i, e := range examples {
-		s := Score(e.string)
+		s := Score([]byte(e.string))
 		if s != e.int {
 			t.Errorf("'%s' (example #%d): got %d, expected %d",
 				e.string, i, s, e.int)
@@ -66,13 +66,21 @@ func TestCLLExamples(t *testing.T) {
 		{[][]string{{"loj", "logj"}, {"ban", "bau", "bang"}, {"gir", "girz"}}, "lojbaugir", 8816},
 		{[][]string{{"nak", "nakn"}, {"kem"}, {"cin", "cins"}, {"ctu", "ctuca"}}, "nakykemcinctu", 12876}}
 	for i, e := range examples {
-		s, err := Lujvo(e.selci)
+		newSelci := make([][][]byte, len(e.selci))
+		for i, u := range e.selci {
+			newUnit := make([][]byte, len(u))
+			for j, u := range e.selci[i] {
+				newUnit[j] = []byte(u)
+			}
+			newSelci[i] = newUnit
+		}
+		s, err := Lujvo(newSelci)
 		if err != nil {
 			t.Errorf("(example #%d): error %v", i, err)
 			continue
 		}
 		score := Score(s)
-		if s != e.lujvo || score != e.score {
+		if string(s) != e.lujvo || score != e.score {
 			t.Errorf("(example #%d): got %s (%d), expected %s (%d)",
 				i, s, score, e.lujvo, e.score)
 		}
@@ -89,7 +97,7 @@ func TestIsTosmabruInitial(t *testing.T) {
 		"pevrisn":   false,
 	}
 	for k, v := range examples {
-		res := isTosmabruInitial(k)
+		res := isTosmabruInitial([]byte(k))
 		if res != v {
 			t.Errorf("'%s': got %v",
 				k, res)

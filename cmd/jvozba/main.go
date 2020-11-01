@@ -15,7 +15,7 @@ func main() {
 		if err != nil {
 			fmt.Printf("got error: %v\n", err)
 		} else {
-			fmt.Printf("%s → %s (%d)\n", in, res, jvozba.Score(res))
+			fmt.Printf("%s → %s (%d)\n", in, res, jvozba.Score([]byte(res)))
 		}
 	}
 }
