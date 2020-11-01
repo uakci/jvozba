@@ -273,28 +273,35 @@ func katna(lujvo []byte) ([]byte, []byte) {
 
 func Katna(lujvo []byte) (result [][]byte) {
 	chunk := make([][]byte, 0, len(lujvo)/3)
-	fuhivlaTainted := false
+	fuhivlaTainted, i := false, 0
 	var rafsi []byte
 	for len(lujvo) > 0 {
 		rafsi, lujvo = katna(lujvo)
 		tai := rafsiTarmi(rafsi)
 		switch tai {
 		case hyphen:
-			if fuhivlaTainted {
-				res := bytes.Join(chunk, []byte{})
-				if isConsonant(res[len(res)-1]) {
-					res = append(res, 'a')
-				} else if res[len(res)-1] == '\'' {
-					res = res[:len(res)-1]
-				} else {
-					res = append(res, 'a')
+			if rafsi[0] != 'y' {
+				if i != 1 {
+					chunk = append(chunk, rafsi)
+					fuhivlaTainted = true
 				}
-				result = append(result, res)
 			} else {
-				result = append(result, chunk...)
+				if fuhivlaTainted {
+					res := bytes.Join(chunk, []byte{})
+					if isConsonant(res[len(res)-1]) {
+						res = append(res, 'a')
+					} else if res[len(res)-1] == '\'' {
+						res = res[:len(res)-1]
+					} else {
+						res = append(res, 'a')
+					}
+					result = append(result, res)
+				} else {
+					result = append(result, chunk...)
+				}
+				chunk = [][]byte{}
+				fuhivlaTainted = false
 			}
-			chunk = [][]byte{}
-			fuhivlaTainted = false
 		case fuhivla:
 			fuhivlaTainted = true
 			fallthrough
@@ -304,6 +311,7 @@ func Katna(lujvo []byte) (result [][]byte) {
 			}
 			chunk = append(chunk, rafsi)
 		}
+		i++
 	}
 	if fuhivlaTainted {
 		res := bytes.Join(chunk, []byte{})
@@ -316,7 +324,11 @@ func Katna(lujvo []byte) (result [][]byte) {
 		}
 		result = append(result, res)
 	} else {
-		result = append(result, chunk...)
+		for _, c := range chunk {
+			if len(c) > 1 {
+				result = append(result, c)
+			}
+		}
 	}
 	return result
 }

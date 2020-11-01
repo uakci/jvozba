@@ -12,6 +12,7 @@ func TestHyphenation(t *testing.T) {
 		parts string
 		types string
 	}{
+		{"zuky'u'enca'yzukte", "zuk-y-'u'e-n-ca'-y-zukte", "5090901"},
 		{"barduku'ynei", "bar-duku'-y-nei", "5908"},
 		{"zbasai", "zba-sai", "78"},
 		{"nunynau", "nun-y-nau", "508"},
@@ -108,9 +109,9 @@ func TestIsTosmabruInitial(t *testing.T) {
 }
 
 func TestKatna(t *testing.T) {
-	res := Katna([]byte("co'arzukybarduku'y'arcyiarciiycizda'u"))
+	res := Katna([]byte("co'arzukybarduku'y'arcyiarciiy'u'enca'ycizda'u"))
 	got := string(bytes.Join(res, []byte{'-'}))
-	if got != "co'a-zuk-barduku-arca-iarciia-ciz-da'u" {
+	if got != "co'a-zuk-barduku-arca-iarciia-u'enca-ciz-da'u" {
 		t.Errorf("%s", got)
 	}
 }
