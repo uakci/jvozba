@@ -36,7 +36,7 @@ func isCmavo(what []byte) bool {
 	return previous != '\''
 }
 
-func isGismu(what []byte) bool {
+func IsGismu(what []byte) bool {
 	return len(what) == 5 &&
 		IsVowel(what[4]) &&
 		IsConsonant(what[0]) && IsConsonant(what[3]) && ((IsVowel(what[1]) && IsConsonant(what[2])) ||
@@ -113,18 +113,18 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 				canShort, canLong = true, false
 			}
 			midPrefix := []byte("y'")
-			if i == 0 || isGismu(p) {
+			if i == 0 || IsGismu(p) {
 				midPrefix = []byte{}
 			} else if IsConsonant(p[0]) || (IsVowel(p[1]) && (p[0] == 'i' || p[0] == 'u')) {
 				midPrefix = []byte{'y'}
 			}
 			if canShort {
-				if !isGismu(p) && ((len(midPrefix) < 2 && isLujvoInitial(p[:len(p)-1])) || config&LongFuhivla == LongFuhivla) {
+				if !IsGismu(p) && ((len(midPrefix) < 2 && isLujvoInitial(p[:len(p)-1])) || config&LongFuhivla == LongFuhivla) {
 					if !final {
 						r = append(r, bytes.Join([][]byte{midPrefix, p, []byte("'y")}, []byte{}))
 					}
-				} else if !(isGismu(p) && bytes.Equal(p[:4], []byte("brod")) && p[4] != 'a') {
-					if final || isGismu(p) {
+				} else if !(IsGismu(p) && bytes.Equal(p[:4], []byte("brod")) && p[4] != 'a') {
+					if final || IsGismu(p) {
 						r = append(r, bytes.Join([][]byte{midPrefix, p[:len(p)-1]}, []byte{}))
 					} else {
 						r = append(r, bytes.Join([][]byte{midPrefix, p[:len(p)-1], {'y'}}, []byte{}))
@@ -144,7 +144,7 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 				if final {
 					keep = config&Brivla == Brivla
 				} else if i == 0 {
-					keep = isGismu(parts[1]) || isCmavo(parts[1])
+					keep = IsGismu(parts[1]) || isCmavo(parts[1])
 				}
 			case cvcc, ccvc, cvc:
 				if final {

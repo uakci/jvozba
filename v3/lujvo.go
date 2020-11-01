@@ -85,7 +85,7 @@ func rafsiTarmi(rafsi []byte) tarmi {
 			return ccvc
 		}
 	case 5:
-		if isGismu(rafsi) {
+		if IsGismu(rafsi) {
 			if IsVowel(rafsi[2]) {
 				return ccvcv
 			} else {
@@ -316,7 +316,7 @@ func Katna(lujvo []byte) (result [][]byte) {
 	if fuhivlaTainted {
 		result = append(result, bytes.Join(chunk, []byte{}))
 	} else {
-    result = append(result, chunk...)
+		result = append(result, chunk...)
 	}
 	return result
 }
