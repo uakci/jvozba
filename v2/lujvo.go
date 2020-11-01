@@ -248,9 +248,9 @@ func katna(lujvo []byte) ([]byte, []byte) {
 	var point /* of cission */ int
 	l := len(lujvo)
 	switch {
-	case l > 0 && lujvo[0] == 'y':
+	case l >= 1 && lujvo[0] == 'y':
 		point = 1
-	case l > 1 && bytes.Equal(lujvo[:2], []byte("'y")):
+	case l >= 2 && bytes.Equal(lujvo[:2], []byte("'y")):
 		point = 2
 	case l >= 4 && (lujvo[0] == 'n' || lujvo[0] == 'r' || lujvo[0] == 'y') && isConsonant(lujvo[1]):
 		point = 1
@@ -272,40 +272,53 @@ func katna(lujvo []byte) ([]byte, []byte) {
 }
 
 func Katna(lujvo []byte) (result [][]byte) {
-  chunk := make([][]byte, 0, len(lujvo) / 3)
-  fuhivlaTainted := false
-  var rafsi []byte
-  for len(lujvo) > 0 {
-    rafsi, lujvo = katna(lujvo)
-    tai := rafsiTarmi(rafsi)
-    switch tai {
-    case hyphen:
-      if fuhivlaTainted {
-        result = append(result, bytes.Join(chunk, []byte{}))
-      } else {
-        result = append(result, chunk...)
-      }
-      chunk = [][]byte{}
-      fuhivlaTainted = false
-    case fuhivla:
-      fuhivlaTainted = true
-      fallthrough
-    default:
-      if rafsi[0] == '\'' {
-        rafsi = rafsi[1:]
-      }
-      if rafsi[len(rafsi) - 1] == '\'' {
-        rafsi = rafsi[:len(rafsi) - 1]
-      }
-      chunk = append(chunk, rafsi)
-    }
-  }
-  if fuhivlaTainted {
-    result = append(result, bytes.Join(chunk, []byte{}))
-  } else {
-    result = append(result, chunk...)
-  }
-  return result
+	chunk := make([][]byte, 0, len(lujvo)/3)
+	fuhivlaTainted := false
+	var rafsi []byte
+	for len(lujvo) > 0 {
+		rafsi, lujvo = katna(lujvo)
+		tai := rafsiTarmi(rafsi)
+		switch tai {
+		case hyphen:
+			if fuhivlaTainted {
+				res := bytes.Join(chunk, []byte{})
+				if isConsonant(res[len(res)-1]) {
+					res = append(res, 'a')
+				} else if res[len(res)-1] == '\'' {
+					res = res[:len(res)-1]
+				} else {
+					res = append(res, 'a')
+				}
+				result = append(result, res)
+			} else {
+				result = append(result, chunk...)
+			}
+			chunk = [][]byte{}
+			fuhivlaTainted = false
+		case fuhivla:
+			fuhivlaTainted = true
+			fallthrough
+		default:
+			if rafsi[0] == '\'' {
+				rafsi = rafsi[1:]
+			}
+			chunk = append(chunk, rafsi)
+		}
+	}
+	if fuhivlaTainted {
+		res := bytes.Join(chunk, []byte{})
+		if isConsonant(res[len(res)-1]) {
+			res = append(res, 'a')
+		} else if res[len(res)-1] == '\'' {
+			res = res[:len(res)-1]
+		} else {
+			res = append(res, 'a')
+		}
+		result = append(result, res)
+	} else {
+		result = append(result, chunk...)
+	}
+	return result
 }
 
 type scored struct {

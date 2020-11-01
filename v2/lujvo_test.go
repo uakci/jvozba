@@ -12,6 +12,7 @@ func TestHyphenation(t *testing.T) {
 		parts string
 		types string
 	}{
+		{"barduku'ynei", "bar-duku'-y-nei", "5908"},
 		{"zbasai", "zba-sai", "78"},
 		{"nunynau", "nun-y-nau", "508"},
 		{"sairzbata'u", "sai-r-zba-ta'u", "8076"},
@@ -107,11 +108,11 @@ func TestIsTosmabruInitial(t *testing.T) {
 }
 
 func TestKatna(t *testing.T) {
-  res := Katna([]byte("co'arzukybarduku'y'arcycizda'u"))
-  got := string(bytes.Join(res, []byte{'-'}))
-  if got != "co'a-zuk-barduku-arc-ciz-da'u" {
-    t.Errorf("%s", got)
-  }
+	res := Katna([]byte("co'arzukybarduku'y'arcyiarciiycizda'u"))
+	got := string(bytes.Join(res, []byte{'-'}))
+	if got != "co'a-zuk-barduku-arca-iarciia-ciz-da'u" {
+		t.Errorf("%s", got)
+	}
 }
 
 func BenchmarkLujvoWithBloti1000(b *testing.B) {

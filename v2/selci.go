@@ -58,45 +58,45 @@ func Selci(tanru string, rafste map[string][]string, config Config) ([][][]byte,
 	if config&(Brivla|Cmevla) == 0 {
 		return [][][]byte{}, fmt.Errorf("neither Cmevla nor Brivla was specified")
 	}
-  parts := make([][]byte, 0, len(tanru) / 6)
-  base := 0
-  for i, r := range tanru {
-    switch {
-    case (r >= 'a' && r <= 'z' && r != 'q' && r != 'w') || r == '\'' || r == ',' || r == '.' || r == '’':
-      continue
-    case r == ' ' || r == '\t' || r == '\r' || r == '\n':
-      if i > base {
-        parts = append(parts, []byte(tanru[base:i]))
-      }
-      base = i + 1
-    default:
-      return [][][]byte{}, fmt.Errorf("unexpected character %v", r)
-    }
-  }
-  if len(tanru) > base {
-    parts = append(parts, []byte(tanru[base:]))
-  }
-  for i, p := range parts {
-    j := 0
-    for ; j < len(p); j++ {
-      if p[j] == 'h' {
-        p[j] = '\''
-      } else if p[j] == 0xe2 {
-        break
-      }
-    }
-    if j != len(p) {
-      offset := 0
-      for ; j < len(p); j++ {
-        if p[j] == 0xe2 {
-          p[j] = '\''
-          copy(p[j+1:],p[j+3:])
-          offset += 2
-        }
-      }
-      parts[i] = p[:j - offset]
-    }
-  }
+	parts := make([][]byte, 0, len(tanru)/6)
+	base := 0
+	for i, r := range tanru {
+		switch {
+		case (r >= 'a' && r <= 'z' && r != 'q' && r != 'w') || r == '\'' || r == ',' || r == '.' || r == '’':
+			continue
+		case r == ' ' || r == '\t' || r == '\r' || r == '\n':
+			if i > base {
+				parts = append(parts, []byte(tanru[base:i]))
+			}
+			base = i + 1
+		default:
+			return [][][]byte{}, fmt.Errorf("unexpected character %v", r)
+		}
+	}
+	if len(tanru) > base {
+		parts = append(parts, []byte(tanru[base:]))
+	}
+	for i, p := range parts {
+		j := 0
+		for ; j < len(p); j++ {
+			if p[j] == 'h' {
+				p[j] = '\''
+			} else if p[j] == 0xe2 {
+				break
+			}
+		}
+		if j != len(p) {
+			offset := 0
+			for ; j < len(p); j++ {
+				if p[j] == 0xe2 {
+					p[j] = '\''
+					copy(p[j+1:], p[j+3:])
+					offset += 2
+				}
+			}
+			parts[i] = p[:j-offset]
+		}
+	}
 
 	selci := make([][][]byte, 0, len(parts))
 	for i, p := range parts {
