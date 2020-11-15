@@ -555,7 +555,6 @@ var Rafsi = map[string][]string{
 	"lakse": {"lak"},
 	"lalxu": {"la'u"},
 	"lamji": {"la'i", "lam"},
-	"lanli": {"lal"},
 	"lanme": {"lan"},
 	"lanxe": {"lax"},
 	"lanzu": {"laz"},
