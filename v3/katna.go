@@ -73,35 +73,35 @@ func Veljvo(lujvo string) ([]string, error) {
 	tanru := make([]string, len(rafpoi))
 	for i, raf := range rafpoi {
 		ok := false
-    comparee := string(raf)
-    hyphenated := raf[len(raf) - 1] == '-'
-    if hyphenated {
-      comparee = string(raf[:len(raf) - 1])
-    }
-    for selrafsi := range Rafsi {
-      if (hyphenated && selrafsi[:len(selrafsi) - 1] == comparee) || (!hyphenated && selrafsi == comparee) {
-        tanru[i] = selrafsi
-        ok = true
-        break
-      }
-    }
-		if !ok {
-			for selrafsi, rafsiporsi := range Rafsi {
-				for _, rafsi := range rafsiporsi {
-					if rafsi == string(raf) {
-						tanru[i] = selrafsi
-						ok = true
-						break
-					}
+		for selrafsi, rafsiporsi := range Rafsi {
+			for _, rafsi := range rafsiporsi {
+				if rafsi == string(raf) {
+					tanru[i] = selrafsi
+					ok = true
+					break
 				}
-				if ok {
+			}
+			if ok {
+				break
+			}
+		}
+		if !ok {
+			comparee := string(raf)
+			hyphenated := raf[len(raf)-1] == '-'
+			if hyphenated {
+				comparee = string(raf[:len(raf)-1])
+			}
+			for selrafsi := range Rafsi {
+				if (hyphenated && selrafsi[:len(selrafsi)-1] == comparee) || (!hyphenated && selrafsi == comparee) {
+					tanru[i] = selrafsi
+					ok = true
 					break
 				}
 			}
 		}
 		if !ok {
-			if raf[len(raf) - 1] == '-' {
-        tanru[i] = string(raf)
+			if raf[len(raf)-1] == '-' {
+				tanru[i] = string(raf)
 			} else {
 				tanru[i] = fmt.Sprintf("-%s-", raf)
 			}
