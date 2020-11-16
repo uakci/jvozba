@@ -6,6 +6,14 @@ import (
 	"testing"
 )
 
+func byter(s string) [][]byte {
+	b, e := Byter(s)
+	if e != nil {
+		panic(e)
+	}
+	return b
+}
+
 func TestGeneration(t *testing.T) {
 	type example struct {
 		config Config
@@ -28,7 +36,7 @@ func TestGeneration(t *testing.T) {
 		{Brivla | LongFuhivla, "barduku nelci", [][]string{{"barduku'y"}, {"nei", "nelci"}}},
 	}
 	for i, e := range examples {
-		s, err := Selci(e.tanru, Rafsi, e.config)
+		s, err := Selci(byter(e.tanru), Rafsi, e.config)
 		s_ := make([][]string, len(s))
 		for i, sss := range s {
 			ss := make([]string, len(sss))
@@ -46,17 +54,19 @@ func TestGeneration(t *testing.T) {
 }
 
 func BenchmarkSelciWithBloti1000(b *testing.B) {
-	bloti := strings.Repeat("bloti", 1000)
+	bloti := strings.Repeat("bloti ", 1000)
+	bl, _ := Byter(bloti)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = Selci(bloti, Rafsi, Brivla)
+		_, _ = Selci(bl, Rafsi, Brivla)
 	}
 }
 
 func BenchmarkSelciWithBlaci1000(b *testing.B) {
-	blaci := strings.Repeat("blaci", 1000)
+	blaci := strings.Repeat("blaci ", 1000)
+	bl, _ := Byter(blaci)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = Selci(blaci, Rafsi, Brivla)
+		_, _ = Selci(bl, Rafsi, Brivla)
 	}
 }

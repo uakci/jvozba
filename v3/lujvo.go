@@ -48,16 +48,16 @@ const (
 
 func rafsiTarmi(rafsi []byte) tarmi {
 	l := len(rafsi)
-	if l == 0 || (!IsConsonant(rafsi[0]) && l != 1) {
+	if l == 0 {
+		return fuhivla
+	} else if l == 2 && rafsi[0] == '\'' && rafsi[1] == 'y' {
+		return hyphen
+	} else if !IsConsonant(rafsi[0]) && l != 1 {
 		return fuhivla
 	}
 	switch l {
 	case 1:
 		if len(rafsi) == 1 && (rafsi[0] == 'y' || rafsi[0] == 'r' || rafsi[0] == 'n') {
-			return hyphen
-		}
-	case 2:
-		if bytes.Equal(rafsi, []byte("'y")) {
 			return hyphen
 		}
 	case 3:
@@ -166,13 +166,6 @@ func needsY(previous byte, current []byte) bool {
 	return false
 }
 
-var invalidClusters = [][2]byte{
-	'c': {'x'},
-	'k': {'x'},
-	'x': {'c', 'k'},
-	'm': {'z'},
-}
-
 var validInitials = map[byte][]byte{
 	'b': {'l', 'r'},
 	'c': {'f', 'k', 'l', 'm', 'n', 'p', 'r', 't'},
@@ -190,6 +183,7 @@ var validInitials = map[byte][]byte{
 	'z': {'b', 'd', 'g', 'm', 'v'},
 }
 
+// Returns true if twoBytes is a valid initial consonant cluster.
 func isValidInitial(twoBytes ...byte) bool {
 	if len(twoBytes) != 2 {
 		return false
@@ -229,18 +223,14 @@ func isTosmabruInitial(lujvo []byte) bool {
 	return true
 }
 
-// Mind the lack of y.
-func IsVowel(one byte) bool {
-	switch one {
-	case 'a', 'e', 'i', 'o', 'u':
-		return true
-	default:
-		return false
-	}
+// Matches aeiou (not y!).
+func IsVowel(o byte) bool {
+	return o == 'a' || o == 'e' || o == 'i' || o == 'o' || o == 'u'
 }
 
-func IsConsonant(one byte) bool {
-	return !IsVowel(one) && one != 'y' && one != '\''
+// Matches bcdfgjklmnprstvxz.
+func IsConsonant(o byte) bool {
+	return !(o < 'a' || o > 'z' || o == 'a' || o == 'e' || o == 'i' || o == 'o' || o == 'u' || o == 'y')
 }
 
 // Make one cut. Atrocious code.
@@ -250,75 +240,28 @@ func katna(lujvo []byte) ([]byte, []byte) {
 	switch {
 	case l >= 1 && lujvo[0] == 'y':
 		point = 1
-	case l >= 2 && bytes.Equal(lujvo[:2], []byte("'y")):
+	case l >= 2 && lujvo[0] == '\'' && lujvo[1] == 'y':
 		point = 2
 	case l >= 4 && (lujvo[0] == 'n' || lujvo[0] == 'r' || lujvo[0] == 'y') && IsConsonant(lujvo[1]):
 		point = 1
+	case l >= 8 && lujvo[3] == '\'' && lujvo[4] == 'y':
+		point = 3
 	case l >= 8 && lujvo[4] == 'y':
 		point = 4
 	case l >= 7 && lujvo[3] == 'y':
 		point = 3
-	case l >= 7 && lujvo[2] == '\'' && IsVowel(lujvo[3]):
+	case l >= 7 && lujvo[2] == '\'' && lujvo[3] != 'y':
 		point = 4
 	case l >= 6 && bytes.Index(lujvo[:6], []byte{'y'}) == -1:
 		point = 3
 	default:
-		point = bytes.Index(lujvo, []byte{'y'})
-		if point == -1 {
-			point = l
+		for point = 0; point < l; point++ {
+			if lujvo[point] == 'y' {
+				break
+			}
 		}
 	}
 	return lujvo[:point], lujvo[point:]
-}
-
-func Katna(lujvo []byte) (result [][]byte) {
-	chunk := make([][]byte, 0, len(lujvo)/3)
-	fuhivlaTainted, i := false, 0
-	var rafsi []byte
-	for len(lujvo) > 0 {
-		rafsi, lujvo = katna(lujvo)
-		tai := rafsiTarmi(rafsi)
-		switch tai {
-		case hyphen:
-			if rafsi[0] != 'y' {
-				if i != 1 {
-					chunk = append(chunk, rafsi)
-					fuhivlaTainted = true
-				}
-			} else {
-				if fuhivlaTainted {
-					res := bytes.Join(chunk, []byte{})
-					if IsConsonant(res[len(res)-1]) {
-						res = append(res, 'a')
-					} else if res[len(res)-1] == '\'' {
-						res = res[:len(res)-1]
-					} else {
-						res = append(res, 'a')
-					}
-					result = append(result, res)
-				} else {
-					result = append(result, chunk...)
-				}
-				chunk = [][]byte{}
-				fuhivlaTainted = false
-			}
-		case fuhivla:
-			fuhivlaTainted = true
-			fallthrough
-		default:
-			if rafsi[0] == '\'' {
-				rafsi = rafsi[1:]
-			}
-			chunk = append(chunk, rafsi)
-		}
-		i++
-	}
-	if fuhivlaTainted {
-		result = append(result, bytes.Join(chunk, []byte{}))
-	} else {
-		result = append(result, chunk...)
-	}
-	return result
 }
 
 type scored struct {

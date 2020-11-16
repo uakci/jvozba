@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-func TestNoralujv(t *testing.T) {
-	for i, n := range noralujv {
+func TestJvozba(t *testing.T) {
+	for i, n := range jvozbaTests {
 		res, err := Jvozba(n.tanru, Brivla)
 		if err != nil {
 			t.Errorf("on example #%d (%s): got error: %v", i, n.lujvo, err)
@@ -27,16 +27,11 @@ func TestCmevlaBrivla(t *testing.T) {
 
 func BenchmarkJvozbaWithNoralujv(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = Jvozba(noralujv[i%len(noralujv)].lujvo, Brivla)
+		_, _ = Jvozba(jvozbaTests[i%len(jvozbaTests)].lujvo, Brivla)
 	}
 }
 
-type nora struct {
-	lujvo string
-	tanru string
-}
-
-var noralujv = []nora{
+var jvozbaTests = []struct{ lujvo, tanru string }{
 	// own tests
 	{"barduku'ykei", "barduku kelci"},
 	{"miby'ismu", "mi ismu"},
@@ -50,6 +45,10 @@ var noralujv = []nora{
 	{"bapyiicne", "bapli iicne"},
 	{"fatryiicne", "fatri iicne"},
 	{"fatry'aicne", "fatri aicne"},
+	{"zmogai", "-zmo- gacri"},
+	{"barbytadji", "barb- tadji"},
+	{"bloblobloblobloblobloblobloblo", "bloti bloti bloti bloti bloti bloti bloti bloti bloti bloti"},
+	{"blacyblacyblacyblacyblacyblacyblacyblacyblacyblaci", "blaci blaci blaci blaci blaci blaci blaci blaci blaci blaci"},
 
 	// the original noralujv
 	{"ba'armo'a", "barna morna"},

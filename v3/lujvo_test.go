@@ -2,7 +2,6 @@ package jvozba
 
 import (
 	"bytes"
-	"strings"
 	"testing"
 )
 
@@ -12,6 +11,8 @@ func TestHyphenation(t *testing.T) {
 		parts string
 		types string
 	}{
+		{"zgazga'yiicte", "zga-zga-'y-iicte", "7709"},
+		{"zgazga'ynicte", "zga-zga-'y-nicte", "7701"}, // this shouldn’t occur
 		{"zuky'u'enca'yzukte", "zuk-y-'u'e-n-ca'-y-zukte", "5090901"},
 		{"barduku'ynei", "bar-duku'-y-nei", "5908"},
 		{"zbasai", "zba-sai", "78"},
@@ -98,26 +99,21 @@ func TestIsTosmabruInitial(t *testing.T) {
 		"skebap":    false,
 		"skebai":    false,
 		"pevrisn":   false,
+		"pevrisna":  true,
 	}
 	for k, v := range examples {
 		res := isTosmabruInitial([]byte(k))
 		if res != v {
-			t.Errorf("'%s': got %v",
-				k, res)
+			t.Errorf("'%s': got %v", k, res)
 		}
 	}
 }
 
-func TestKatna(t *testing.T) {
-	res := Katna([]byte("co'arzukybarduku'y'arcyiarciiy'u'enca'ycizda'u"))
-	got := string(bytes.Join(res, []byte{'-'}))
-	if got != "co'a-zuk-barduku-arca-iarciia-u'enca-ciz-da'u" {
-		t.Errorf("%s", got)
-	}
-}
-
 func BenchmarkLujvoWithBloti1000(b *testing.B) {
-	bloti := strings.Repeat("bloti", 1000)
+	bloti := make([][]byte, 1000)
+	for i := range bloti {
+		bloti[i] = []byte("bloti")
+	}
 	selci, _ := Selci(bloti, Rafsi, Brivla)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -126,7 +122,10 @@ func BenchmarkLujvoWithBloti1000(b *testing.B) {
 }
 
 func BenchmarkLujvoWithBlaci1000(b *testing.B) {
-	blaci := strings.Repeat("blaci", 1000)
+	blaci := make([][]byte, 1000)
+	for i := range blaci {
+		blaci[i] = []byte("blaci")
+	}
 	selci, _ := Selci(blaci, Rafsi, Brivla)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

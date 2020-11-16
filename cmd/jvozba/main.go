@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	jvozba "github.com/uakci/jvozba/v2"
+	jvozba "github.com/uakci/jvozba/v3"
 	"os"
 )
 
