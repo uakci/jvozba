@@ -73,15 +73,18 @@ func Veljvo(lujvo string) ([]string, error) {
 	tanru := make([]string, len(rafpoi))
 	for i, raf := range rafpoi {
 		ok := false
-		if IsGismu(raf) || (len(raf) == 4 && IsGismu(append(append(make([]byte, 0, 5), raf...), 'a'))) {
-			for selrafsi := range Rafsi {
-				if len(selrafsi) == 5 && selrafsi[:4] == string(raf[:4]) {
-					tanru[i] = selrafsi
-					ok = true
-					break
-				}
-			}
-		}
+    comparee := string(raf)
+    hyphenated := raf[len(raf) - 1] == '-'
+    if hyphenated {
+      comparee = string(raf[:len(raf) - 1])
+    }
+    for selrafsi := range Rafsi {
+      if (hyphenated && selrafsi[:len(selrafsi) - 1] == comparee) || (!hyphenated && selrafsi == comparee) {
+        tanru[i] = selrafsi
+        ok = true
+        break
+      }
+    }
 		if !ok {
 			for selrafsi, rafsiporsi := range Rafsi {
 				for _, rafsi := range rafsiporsi {
@@ -97,12 +100,8 @@ func Veljvo(lujvo string) ([]string, error) {
 			}
 		}
 		if !ok {
-			if len(raf) >= 4 && !IsCmavo(raf) {
-				if IsConsonant(raf[len(raf)-1]) {
-					tanru[i] = string(raf) + "-"
-				} else {
-					tanru[i] = string(raf)
-				}
+			if raf[len(raf) - 1] == '-' {
+        tanru[i] = string(raf)
 			} else {
 				tanru[i] = fmt.Sprintf("-%s-", raf)
 			}
