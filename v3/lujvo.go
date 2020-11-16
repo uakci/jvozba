@@ -96,106 +96,6 @@ func rafsiTarmi(rafsi []byte) tarmi {
 	return fuhivla
 }
 
-type zunsna int
-
-const (
-	unvoiced zunsna = iota
-	voiced
-	liquid
-)
-
-func zunsnaType(one byte) zunsna {
-	switch one {
-	case 'b', 'd', 'g', 'v', 'j', 'z':
-		return voiced
-	case 'p', 't', 'k', 'f', 'c', 's', 'x':
-		return unvoiced
-	default:
-		return liquid
-	}
-}
-
-func isCjsz(one byte) bool {
-	switch one {
-	case 'c', 'j', 's', 'z':
-		return true
-	default:
-		return false
-	}
-}
-
-// `needsY` checks if an y-hyphen needs to be inserted
-func needsY(previous byte, current []byte) bool {
-	if IsVowel(previous) {
-		return false
-	}
-	head := current[0]
-	prevType := zunsnaType(previous)
-	headType := zunsnaType(head)
-	if (prevType == voiced && headType == unvoiced) || (headType == voiced && prevType == unvoiced) || previous == head || (isCjsz(previous) && isCjsz(head)) {
-		return true
-	}
-	switch previous {
-	case 'c', 'k':
-		if head == 'x' {
-			return true
-		}
-	case 'x':
-		if head == 'c' || head == 'k' {
-			return true
-		}
-	case 'm':
-		if head == 'z' {
-			return true
-		}
-	case 'n':
-		if len(current) < 2 {
-			break
-		}
-		switch current[0] {
-		case 't':
-			if current[1] == 's' || current[1] == 'c' {
-				return true
-			}
-		case 'd':
-			if current[1] == 'z' || current[1] == 'j' {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-var validInitials = map[byte][]byte{
-	'b': {'l', 'r'},
-	'c': {'f', 'k', 'l', 'm', 'n', 'p', 'r', 't'},
-	'd': {'j', 'r', 'z'},
-	'f': {'l', 'r'},
-	'g': {'l', 'r'},
-	'j': {'b', 'd', 'g', 'm', 'v'},
-	'k': {'l', 'r'},
-	'm': {'l', 'r'},
-	'p': {'l', 'r'},
-	's': {'f', 'k', 'l', 'm', 'n', 'p', 'r', 't'},
-	't': {'c', 'r', 's'},
-	'v': {'l', 'r'},
-	'x': {'l', 'r'},
-	'z': {'b', 'd', 'g', 'm', 'v'},
-}
-
-// Returns true if twoBytes is a valid initial consonant cluster.
-func isValidInitial(twoBytes ...byte) bool {
-	if len(twoBytes) != 2 {
-		return false
-	}
-	for _, validInitial := range validInitials[twoBytes[0]] {
-		if validInitial == twoBytes[1] {
-			return true
-		}
-	}
-	return false
-}
-
 // Whether `lujvo` could lead to tosmabru on appending -y or is one already.
 func isTosmabruInitial(lujvo []byte) bool {
 	var r []byte
@@ -205,14 +105,14 @@ func isTosmabruInitial(lujvo []byte) bool {
 		r, lujvo = katna(lujvo)
 		switch t := rafsiTarmi(r); t {
 		case cvc:
-			if i > 0 && !isValidInitial(lastChar, r[0]) {
+			if i > 0 && !IsValidInitial(lastChar, r[0]) {
 				return false
 			}
 			lastChar = r[2]
 		case cvccv:
 			return i > 0 &&
-				isValidInitial(lastChar, r[0]) &&
-				isValidInitial(r[2], r[3])
+				IsValidInitial(lastChar, r[0]) &&
+				IsValidInitial(r[2], r[3])
 		case hyphen:
 			return i > 1 && bytes.Equal(r, []byte{'y'})
 		default:
@@ -221,16 +121,6 @@ func isTosmabruInitial(lujvo []byte) bool {
 		i++
 	}
 	return true
-}
-
-// Matches aeiou (not y!).
-func IsVowel(o byte) bool {
-	return o == 'a' || o == 'e' || o == 'i' || o == 'o' || o == 'u'
-}
-
-// Matches bcdfgjklmnprstvxz.
-func IsConsonant(o byte) bool {
-	return !(o < 'a' || o > 'z' || o == 'a' || o == 'e' || o == 'i' || o == 'o' || o == 'u' || o == 'y')
 }
 
 // Make one cut. Atrocious code.
@@ -288,7 +178,7 @@ func Lujvo(selci [][][]byte) ([]byte, error) {
 			var bestTosmabru *scored
 			for _, laldo := range candidates {
 				hyphen := []byte{}
-				if len(laldo.lujvo) > 0 && needsY(laldo.lujvo[len(laldo.lujvo)-1], rafsi[:2]) {
+				if len(laldo.lujvo) > 0 && IsInvalidCluster(laldo.lujvo[len(laldo.lujvo)-1], rafsi[:2]) {
 					hyphen = []byte{'y'}
 				} else if !isLast && rafsiTarmi(selci[selciN+1][0]) == fuhivla {
 					switch rafsiTarmi(rafsi) {

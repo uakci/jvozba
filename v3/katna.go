@@ -62,7 +62,7 @@ func Katna(lujvo []byte) (result [][]byte) {
 }
 
 func Veljvo(lujvo string) ([]string, error) {
-	pieces, err := Byter(lujvo)
+	pieces, err := Normalize(lujvo)
 	if err != nil {
 		return []string{}, err
 	}

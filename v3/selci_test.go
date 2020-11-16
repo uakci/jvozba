@@ -7,7 +7,7 @@ import (
 )
 
 func byter(s string) [][]byte {
-	b, e := Byter(s)
+	b, e := Normalize(s)
 	if e != nil {
 		panic(e)
 	}
@@ -55,7 +55,7 @@ func TestGeneration(t *testing.T) {
 
 func BenchmarkSelciWithBloti1000(b *testing.B) {
 	bloti := strings.Repeat("bloti ", 1000)
-	bl, _ := Byter(bloti)
+	bl, _ := Normalize(bloti)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = Selci(bl, Rafsi, Brivla)
@@ -64,7 +64,7 @@ func BenchmarkSelciWithBloti1000(b *testing.B) {
 
 func BenchmarkSelciWithBlaci1000(b *testing.B) {
 	blaci := strings.Repeat("blaci ", 1000)
-	bl, _ := Byter(blaci)
+	bl, _ := Normalize(blaci)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = Selci(bl, Rafsi, Brivla)
