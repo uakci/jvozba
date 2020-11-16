@@ -1,7 +1,7 @@
 package jvozba
 
 import (
-  "fmt"
+	"fmt"
 )
 
 // Convert a string to an ASCII []byte slice for faster processing, applying

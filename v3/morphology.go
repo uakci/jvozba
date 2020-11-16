@@ -1,7 +1,7 @@
 package jvozba
 
 import (
-  "bytes"
+	"bytes"
 )
 
 func IsCmavo(what []byte) bool {
